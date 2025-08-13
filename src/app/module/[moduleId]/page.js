@@ -1,11 +1,15 @@
-'use client';
-
-import { useParams } from 'next/navigation';
 import { AppProvider } from '@/contexts/AppContext';
 import ModulePage from '@/components/ModulePage';
+import { fraudModules } from '@/data/modules';
 
-export default function Module() {
-  const params = useParams();
+// Generate static params for all module IDs
+export async function generateStaticParams() {
+  return fraudModules.map((module) => ({
+    moduleId: module.id,
+  }));
+}
+
+export default function Module({ params }) {
   const moduleId = params.moduleId;
 
   return (
