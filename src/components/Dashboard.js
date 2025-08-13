@@ -13,7 +13,7 @@ export default function Dashboard() {
   const handleStartModule = (moduleId) => {
     dispatch({ type: 'START_MODULE', payload: { moduleId } });
     // Navigation to module page would go here
-    window.location.href = `/module/${moduleId}`;
+    window.location.href = `${process.env.NODE_ENV === 'production' ? '/fraud-guard' : ''}/module/${moduleId}`;
   };
 
   return (
@@ -112,18 +112,18 @@ export default function Dashboard() {
             >
               📞 Report Fraud: 1930
             </a>
-            <a 
+            <Link 
               href="/bank-helplines"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
             >
               🏦 Bank Helplines
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/emergency"
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
             >
               📋 Step-by-Step Guide
-            </a>
+            </Link>
           </div>
         </div>
       </main>
