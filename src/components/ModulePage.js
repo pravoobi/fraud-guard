@@ -10,10 +10,10 @@ export default function ModulePage({ moduleId }) {
   const { state, dispatch } = useApp();
   const [activeScenarioId, setActiveScenarioId] = useState(null);
   
-  const module = fraudModules.find(m => m.id === moduleId);
+  const currentModule = fraudModules.find(m => m.id === moduleId);
   const progress = state.progress.modulesProgress[moduleId];
 
-  if (!module) {
+  if (!currentModule) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -40,7 +40,7 @@ export default function ModulePage({ moduleId }) {
     setTimeout(() => {
       const updatedState = JSON.parse(sessionStorage.getItem('fraudAwarenessApp') || '{}');
       const completedScenarios = Object.keys(updatedState.progress?.scenariosProgress || {});
-      const moduleScenarios = module.scenarios.map(s => s.id);
+      const moduleScenarios = currentModule.scenarios.map(s => s.id);
       const allCompleted = moduleScenarios.every(sid => 
         completedScenarios.includes(sid) && 
         updatedState.progress.scenariosProgress[sid].completed
@@ -63,11 +63,11 @@ export default function ModulePage({ moduleId }) {
   };
 
   if (activeScenarioId) {
-    const scenario = module.scenarios.find(s => s.id === activeScenarioId);
+    const scenario = currentModule.scenarios.find(s => s.id === activeScenarioId);
     return (
       <ScenarioEngine 
         scenario={scenario}
-        module={module}
+        module={currentModule}
         onComplete={handleCompleteScenario}
         onExit={() => setActiveScenarioId(null)}
       />
@@ -84,16 +84,16 @@ export default function ModulePage({ moduleId }) {
               <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 font-medium">
                 ← Back to Dashboard
               </Link>
-              <div className="text-2xl">{module.icon}</div>
+              <div className="text-2xl">{currentModule.icon}</div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{module.title}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{module.description}</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{currentModule.title}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{currentModule.description}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600 dark:text-gray-300">
-                <div>Difficulty: <span className="font-semibold">{module.difficulty}</span></div>
-                <div>Duration: <span className="font-semibold">{module.estimatedTime}</span></div>
+                <div>Difficulty: <span className="font-semibold">{currentModule.difficulty}</span></div>
+                <div>Duration: <span className="font-semibold">{currentModule.estimatedTime}</span></div>
               </div>
             </div>
           </div>
@@ -142,19 +142,19 @@ export default function ModulePage({ moduleId }) {
                   <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
                     <span>Scenarios Completed</span>
                     <span>{Object.keys(state.progress.scenariosProgress).filter(id => 
-                      module.scenarios.some(s => s.id === id) && 
+                      currentModule.scenarios.some(s => s.id === id) && 
                       state.progress.scenariosProgress[id]?.completed
-                    ).length}/{module.scenarios.length}</span>
+                    ).length}/{currentModule.scenarios.length}</span>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                     <div 
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                       style={{ 
-                        width: `${module.scenarios.length > 0 ? 
+                        width: `${currentModule.scenarios.length > 0 ? 
                           (Object.keys(state.progress.scenariosProgress).filter(id => 
-                            module.scenarios.some(s => s.id === id) && 
+                            currentModule.scenarios.some(s => s.id === id) && 
                             state.progress.scenariosProgress[id]?.completed
-                          ).length / module.scenarios.length) * 100 : 0}%` 
+                          ).length / currentModule.scenarios.length) * 100 : 0}%` 
                       }}
                     ></div>
                   </div>
@@ -180,10 +180,10 @@ export default function ModulePage({ moduleId }) {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Interactive Scenarios</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {module.scenarios.map((scenario, index) => {
+            {currentModule.scenarios.map((scenario, index) => {
               const scenarioProgress = state.progress.scenariosProgress[scenario.id];
               const isCompleted = scenarioProgress?.completed || false;
-              const isUnlocked = index === 0 || state.progress.scenariosProgress[module.scenarios[index - 1]?.id]?.completed;
+              const isUnlocked = index === 0 || state.progress.scenariosProgress[currentModule.scenarios[index - 1]?.id]?.completed;
 
               return (
                 <div 

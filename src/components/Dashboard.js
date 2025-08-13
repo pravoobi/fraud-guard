@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useApp } from '@/contexts/AppContext';
 import { fraudModules } from '@/data/modules';
 import ModuleCard from './ModuleCard';
@@ -21,13 +22,13 @@ export default function Dashboard() {
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <a href="/" className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center space-x-4">
               <div className="text-3xl">🛡️</div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">FraudGuard</h1>
                 <p className="text-sm text-gray-600 dark:text-gray-300">Fraud Awareness eLearning Platform</p>
               </div>
-            </a>
+            </Link>
             <div className="flex items-center space-x-6">
               <FraudAwarenessScore score={state.user.fraudAwarenessScore} />
               <div className="text-sm text-gray-600 dark:text-gray-300">
