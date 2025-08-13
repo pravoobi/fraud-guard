@@ -126,7 +126,7 @@ export default function LandingPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-300">Fraud Awareness & Protection Platform</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-4">
               <Link 
                 href="/dashboard"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
@@ -174,7 +174,7 @@ export default function LandingPage() {
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Learn to recognize and defend against the most common fraud scenarios. Test your knowledge with real-world examples and stay one step ahead of scammers.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
               href="/dashboard"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors flex items-center space-x-2"
