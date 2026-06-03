@@ -1,6 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { fraudModules } from '@/data/modules';
+
+const totalModules = fraudModules.length;
+const totalScenarios = fraudModules.reduce((sum, m) => sum + m.scenarios.length, 0);
 
 export default function LandingPage() {
   const scenarios = [
@@ -171,9 +175,28 @@ export default function LandingPage() {
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Protect Yourself from Digital Fraud
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-6 max-w-3xl mx-auto">
             Learn to recognize and defend against the most common fraud scenarios. Test your knowledge with real-world examples and stay one step ahead of scammers.
           </p>
+
+          {/* Stat strip */}
+          <div className="flex justify-center gap-6 sm:gap-12 mb-8">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{totalModules}</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">Learning Modules</div>
+            </div>
+            <div className="w-px bg-gray-200 dark:bg-gray-700 self-stretch"></div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{totalScenarios}</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">Interactive Scenarios</div>
+            </div>
+            <div className="w-px bg-gray-200 dark:bg-gray-700 self-stretch"></div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">1</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">Certificate</div>
+            </div>
+          </div>
+
           <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link 
               href="/dashboard"
@@ -504,6 +527,9 @@ export default function LandingPage() {
               </Link>
               <Link href="/bank-helplines" className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
                 Bank Helplines
+              </Link>
+              <Link href="/certificate" className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                Certificate
               </Link>
             </div>
           </div>

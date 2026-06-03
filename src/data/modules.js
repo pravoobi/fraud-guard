@@ -5,7 +5,7 @@ export const fraudModules = [
     description: 'Learn to identify and prevent UPI-related frauds',
     icon: '💳',
     difficulty: 'Beginner',
-    estimatedTime: '15 mins',
+    estimatedTime: '20 mins',
     color: 'bg-blue-500',
     scenarios: [
       {
@@ -19,6 +19,12 @@ export const fraudModules = [
         title: 'Payment Request vs Payment Flow',
         description: 'Understanding the difference between sending and receiving money',
         type: 'upi-interface'
+      },
+      {
+        id: 'qr-code-fraud',
+        title: 'QR Code Payment Fraud',
+        description: 'A buyer sends you a QR code claiming it will credit money to you — learn the truth',
+        type: 'education'
       }
     ]
   },
@@ -74,7 +80,7 @@ export const fraudModules = [
     description: 'Protect your identity documents from misuse',
     icon: '🆔',
     difficulty: 'Intermediate',
-    estimatedTime: '18 mins',
+    estimatedTime: '22 mins',
     color: 'bg-red-500',
     scenarios: [
       {
@@ -82,6 +88,12 @@ export const fraudModules = [
         title: 'Aadhaar/PAN Fraud Detection',
         description: 'Learn to protect your identity documents from misuse and fraud',
         type: 'education'
+      },
+      {
+        id: 'fake-aadhaar-call',
+        title: 'Fake UIDAI Aadhaar Call',
+        description: 'A caller threatens your Aadhaar will be deactivated unless you share an OTP immediately',
+        type: 'phone-call'
       }
     ]
   },
@@ -91,7 +103,7 @@ export const fraudModules = [
     description: 'Avoid instant loan and credit card frauds',
     icon: '💰',
     difficulty: 'Advanced',
-    estimatedTime: '25 mins',
+    estimatedTime: '28 mins',
     color: 'bg-yellow-500',
     scenarios: [
       {
@@ -99,6 +111,12 @@ export const fraudModules = [
         title: 'Loan/Credit Card Scam Detection',
         description: 'Learn to identify and avoid instant loan and credit card frauds',
         type: 'education'
+      },
+      {
+        id: 'fake-loan-sms',
+        title: 'Fake Pre-Approved Loan SMS',
+        description: 'An SMS offers a ₹5 lakh loan at 0% interest with no documents — spot the fraud',
+        type: 'sms-interface'
       }
     ]
   },
@@ -108,7 +126,7 @@ export const fraudModules = [
     description: 'Recognize and respond to fake authority threats',
     icon: '👮',
     difficulty: 'Advanced',
-    estimatedTime: '22 mins',
+    estimatedTime: '25 mins',
     color: 'bg-indigo-500',
     scenarios: [
       {
@@ -116,6 +134,12 @@ export const fraudModules = [
         title: 'Digital Arrest Scam Protection',
         description: 'Learn to recognize and respond to fake authority threats',
         type: 'education'
+      },
+      {
+        id: 'digital-arrest-call',
+        title: 'Digital Arrest Phone Scam',
+        description: 'A caller claiming to be CBI places you under "digital arrest" and demands ₹75,000',
+        type: 'phone-call'
       }
     ]
   }

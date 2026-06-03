@@ -30,7 +30,7 @@ export default function ModulePage({ moduleId }) {
       );
       dispatch({ type: 'COMPLETE_MODULE', payload: { moduleId, score: averageScore, scenarios: moduleScenarios } });
     }
-  }, [state.progress.scenariosProgress]);
+  }, [state.progress.scenariosProgress]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!currentModule) {
     return (

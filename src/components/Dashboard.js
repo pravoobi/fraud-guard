@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
 import { fraudModules } from '@/data/modules';
 import ModuleCard from './ModuleCard';
@@ -9,12 +10,16 @@ import FraudAwarenessScore from './FraudAwarenessScore';
 
 export default function Dashboard() {
   const { state, dispatch } = useApp();
+  const router = useRouter();
 
   const handleStartModule = (moduleId) => {
     dispatch({ type: 'START_MODULE', payload: { moduleId } });
-    // Navigation to module page would go here
-    window.location.href = `${process.env.NODE_ENV === 'production' ? '/fraud-guard' : ''}/module/${moduleId}`;
+    router.push(`/module/${moduleId}`);
   };
+
+  const allModulesComplete = fraudModules.every(
+    m => state.progress.modulesProgress[m.id]?.completed
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
@@ -33,7 +38,7 @@ export default function Dashboard() {
               <FraudAwarenessScore score={state.user.fraudAwarenessScore} />
               <div className="text-sm text-gray-600 dark:text-gray-300">
                 <div>Streak: <span className="font-semibold text-orange-600">{state.user.streak} days</span></div>
-                <div>Modules: <span className="font-semibold text-green-600">{state.user.completedModules.length}/6</span></div>
+                <div>Modules: <span className="font-semibold text-green-600">{state.user.completedModules.length}/{fraudModules.length}</span></div>
               </div>
             </div>
           </div>
@@ -77,6 +82,27 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* Certificate banner — shown when all modules are complete */}
+        {allModulesComplete && (
+          <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl p-6 mb-8 text-white">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="text-4xl">🏆</div>
+                <div>
+                  <h3 className="text-xl font-bold">You completed all 6 modules!</h3>
+                  <p className="text-blue-100 text-sm">Your Fraud Awareness certificate is ready to download.</p>
+                </div>
+              </div>
+              <Link
+                href="/certificate"
+                className="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
+              >
+                View Certificate →
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Progress Overview */}
         <ProgressOverview />
