@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
+const isGitHubPages = process.env.GITHUB_PAGES === 'true';
+
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
-  basePath: '/fraud-guard',
-  assetPrefix: '/fraud-guard/',
+  ...(isGitHubPages && {
+    basePath: '/fraud-guard',
+    assetPrefix: '/fraud-guard/',
+  }),
   images: {
     unoptimized: true
   }

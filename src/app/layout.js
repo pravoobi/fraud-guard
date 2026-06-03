@@ -1,5 +1,11 @@
 import "./globals.css";
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#2563eb',
+};
+
 export const metadata = {
   title: "FraudGuard - Fraud Awareness eLearning",
   description: "Interactive learning platform to protect yourself from digital fraud, scams, and cybercrime. Learn to identify UPI fraud, bank impersonation, KYC scams, and more.",
@@ -7,8 +13,6 @@ export const metadata = {
   authors: [{ name: "FraudGuard Team" }],
   creator: "FraudGuard",
   publisher: "FraudGuard",
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: "#2563eb",
   icons: {
     icon: [
       {
