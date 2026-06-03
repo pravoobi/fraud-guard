@@ -118,8 +118,8 @@ export default function EducationInterface({ stepData, onChoice, showHint, onUse
             </div>
           )}
 
-          {/* Key Points Summary */}
-          {stepData.keyPoints && (
+          {/* Key Points Summary — string array variant */}
+          {stepData.keyPoints && stepData.keyPoints.every(point => typeof point === 'string') && (
             <div className="space-y-4">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-4">
                 Key Takeaways

@@ -213,26 +213,26 @@ export default function EmergencyPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-              <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">🔒 Prevention Tips</h3>
-              <p className="text-blue-800 dark:text-blue-300 text-sm mb-3">Learn how to protect yourself from future fraud attempts.</p>
-                             <Link href="/dashboard" className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">
-                Start Learning →
+              <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">🔒 UPI Fraud Prevention</h3>
+              <p className="text-blue-800 dark:text-blue-300 text-sm mb-3">Learn to spot fake UPI payment requests and cashback scams.</p>
+              <Link href="/module/upi-fraud" className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">
+                Start Module →
               </Link>
             </div>
 
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
-              <h3 className="font-semibold text-green-900 dark:text-green-200 mb-2">📱 Digital Security</h3>
-              <p className="text-green-800 dark:text-green-300 text-sm mb-3">Best practices for securing your digital devices and accounts.</p>
-              <Link href="/dashboard" className="text-green-600 dark:text-green-400 text-sm font-medium hover:underline">
-                Learn More →
+              <h3 className="font-semibold text-green-900 dark:text-green-200 mb-2">🏦 Bank Impersonation</h3>
+              <p className="text-green-800 dark:text-green-300 text-sm mb-3">Recognise fake bank calls and caller ID spoofing attempts.</p>
+              <Link href="/module/bank-impersonation" className="text-green-600 dark:text-green-400 text-sm font-medium hover:underline">
+                Start Module →
               </Link>
             </div>
 
             <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
-              <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-2">👥 Community Support</h3>
-              <p className="text-purple-800 dark:text-purple-300 text-sm mb-3">Connect with others who have experienced similar situations.</p>
+              <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-2">📋 All Modules</h3>
+              <p className="text-purple-800 dark:text-purple-300 text-sm mb-3">Explore all 6 fraud awareness modules on the dashboard.</p>
               <Link href="/dashboard" className="text-purple-600 dark:text-purple-400 text-sm font-medium hover:underline">
-                Join Community →
+                Go to Dashboard →
               </Link>
             </div>
           </div>

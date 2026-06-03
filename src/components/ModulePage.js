@@ -1,17 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { fraudModules } from '@/data/modules';
 import ScenarioEngine from './ScenarioEngine';
+import ErrorBoundary from './ErrorBoundary';
 import Link from 'next/link';
 
 export default function ModulePage({ moduleId }) {
   const { state, dispatch } = useApp();
   const [activeScenarioId, setActiveScenarioId] = useState(null);
-  
+
   const currentModule = fraudModules.find(m => m.id === moduleId);
   const progress = state.progress.modulesProgress[moduleId];
+
+  // Dispatch COMPLETE_MODULE when all scenarios in this module are done.
+  // Runs reactively on state changes — no setTimeout, no sessionStorage reads.
+  useEffect(() => {
+    if (!currentModule) return;
+    const moduleScenarios = currentModule.scenarios.map(s => s.id);
+    const allCompleted = moduleScenarios.every(
+      sid => state.progress.scenariosProgress[sid]?.completed
+    );
+    if (allCompleted && !state.progress.modulesProgress[moduleId]?.completed) {
+      const averageScore = Math.round(
+        moduleScenarios.reduce((acc, sid) =>
+          acc + (state.progress.scenariosProgress[sid]?.score || 0), 0
+        ) / moduleScenarios.length
+      );
+      dispatch({ type: 'COMPLETE_MODULE', payload: { moduleId, score: averageScore, scenarios: moduleScenarios } });
+    }
+  }, [state.progress.scenariosProgress]);
 
   if (!currentModule) {
     return (
@@ -29,48 +48,23 @@ export default function ModulePage({ moduleId }) {
     setActiveScenarioId(scenarioId);
   };
 
-  const handleCompleteScenario = (scenarioResult) => {
-    dispatch({ 
-      type: 'COMPLETE_SCENARIO', 
-      payload: scenarioResult
-    });
+  // ScenarioEngine dispatches COMPLETE_SCENARIO before calling onComplete.
+  // Module completion is handled by the useEffect above.
+  const handleCompleteScenario = () => {
     setActiveScenarioId(null);
-    
-    // Check if all scenarios in module are completed after the state update
-    setTimeout(() => {
-      const updatedState = JSON.parse(sessionStorage.getItem('fraudAwarenessApp') || '{}');
-      const completedScenarios = Object.keys(updatedState.progress?.scenariosProgress || {});
-      const moduleScenarios = currentModule.scenarios.map(s => s.id);
-      const allCompleted = moduleScenarios.every(sid => 
-        completedScenarios.includes(sid) && 
-        updatedState.progress.scenariosProgress[sid].completed
-      );
-      
-      if (allCompleted) {
-        const averageScore = moduleScenarios.reduce((acc, sid) => {
-          return acc + (updatedState.progress.scenariosProgress[sid]?.score || 0);
-        }, 0) / moduleScenarios.length;
-        
-        dispatch({ 
-          type: 'COMPLETE_MODULE', 
-          payload: { 
-            moduleId, 
-            score: Math.round(averageScore) 
-          } 
-        });
-      }
-    }, 100);
   };
 
   if (activeScenarioId) {
     const scenario = currentModule.scenarios.find(s => s.id === activeScenarioId);
     return (
-      <ScenarioEngine 
-        scenario={scenario}
-        module={currentModule}
-        onComplete={handleCompleteScenario}
-        onExit={() => setActiveScenarioId(null)}
-      />
+      <ErrorBoundary>
+        <ScenarioEngine
+          scenario={scenario}
+          module={currentModule}
+          onComplete={handleCompleteScenario}
+          onExit={() => setActiveScenarioId(null)}
+        />
+      </ErrorBoundary>
     );
   }
 
@@ -126,11 +120,11 @@ export default function ModulePage({ moduleId }) {
                   <p className="text-gray-700 dark:text-gray-300">Learn verification steps and safety protocols</p>
                 </div>
               </div>
-              
+
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">What You'll Learn</h3>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                This module provides hands-on experience with real-world fraud scenarios. 
-                Each interactive scenario teaches you to recognize warning signs, make safe decisions, 
+                This module provides hands-on experience with real-world fraud scenarios.
+                Each interactive scenario teaches you to recognize warning signs, make safe decisions,
                 and protect yourself from common fraud techniques.
               </p>
             </div>
@@ -141,25 +135,25 @@ export default function ModulePage({ moduleId }) {
                 <div>
                   <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
                     <span>Scenarios Completed</span>
-                    <span>{Object.keys(state.progress.scenariosProgress).filter(id => 
-                      currentModule.scenarios.some(s => s.id === id) && 
+                    <span>{Object.keys(state.progress.scenariosProgress).filter(id =>
+                      currentModule.scenarios.some(s => s.id === id) &&
                       state.progress.scenariosProgress[id]?.completed
                     ).length}/{currentModule.scenarios.length}</span>
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${currentModule.scenarios.length > 0 ? 
-                          (Object.keys(state.progress.scenariosProgress).filter(id => 
-                            currentModule.scenarios.some(s => s.id === id) && 
+                      style={{
+                        width: `${currentModule.scenarios.length > 0 ?
+                          (Object.keys(state.progress.scenariosProgress).filter(id =>
+                            currentModule.scenarios.some(s => s.id === id) &&
                             state.progress.scenariosProgress[id]?.completed
-                          ).length / currentModule.scenarios.length) * 100 : 0}%` 
+                          ).length / currentModule.scenarios.length) * 100 : 0}%`
                       }}
                     ></div>
                   </div>
                 </div>
-                
+
                 {progress?.completed && (
                   <div className="bg-green-100 dark:bg-green-900/20 rounded-lg p-4 text-center">
                     <div className="text-2xl mb-2">🎉</div>
@@ -186,7 +180,7 @@ export default function ModulePage({ moduleId }) {
               const isUnlocked = index === 0 || state.progress.scenariosProgress[currentModule.scenarios[index - 1]?.id]?.completed;
 
               return (
-                <div 
+                <div
                   key={scenario.id}
                   className={`
                     bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6
@@ -218,7 +212,7 @@ export default function ModulePage({ moduleId }) {
                         )}
                       </div>
                     </div>
-                    
+
                     {isCompleted && scenarioProgress && (
                       <div className="text-center">
                         <div className="text-green-600 dark:text-green-400 font-bold text-lg">
@@ -243,10 +237,10 @@ export default function ModulePage({ moduleId }) {
                     disabled={!isUnlocked}
                     className={`
                       w-full py-3 px-4 rounded-lg font-semibold transition-colors text-sm
-                      ${!isUnlocked 
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                        : isCompleted 
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/40' 
+                      ${!isUnlocked
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        : isCompleted
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/40'
                           : 'bg-blue-600 hover:bg-blue-700 text-white'
                       }
                     `}
@@ -261,4 +255,4 @@ export default function ModulePage({ moduleId }) {
       </main>
     </div>
   );
-} 
+}

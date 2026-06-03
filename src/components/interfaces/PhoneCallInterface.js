@@ -29,10 +29,10 @@ export default function PhoneCallInterface({ stepData, onChoice, showHint, onUse
   };
 
   return (
-    <div className="max-w-6xl mx-auto flex items-start gap-8">
+    <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-8">
       {/* Phone Frame */}
-      <div className="bg-black rounded-3xl p-4 shadow-2xl flex-shrink-0">
-        <div className="bg-gray-900 rounded-2xl h-[600px] w-[320px] relative overflow-hidden">
+      <div className="bg-black rounded-3xl p-4 shadow-2xl w-full max-w-[340px]">
+        <div className="bg-gray-900 rounded-2xl h-[560px] w-full relative overflow-hidden">
           {/* Call Screen Header */}
           <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-green-500 to-green-600 h-32 flex items-center justify-center">
             <div className="text-center text-white">
@@ -83,17 +83,17 @@ export default function PhoneCallInterface({ stepData, onChoice, showHint, onUse
             </div>
           )}
 
-          {/* Phone Action Buttons */}
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
-            <button className="w-16 h-16 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-xl">
+          {/* Phone Action Buttons — decorative UI, choices are in the panel on the right */}
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4" aria-hidden="true">
+            <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center text-white text-xl pointer-events-none select-none">
               📞
-            </button>
-            <button className="w-12 h-12 bg-gray-600 hover:bg-gray-700 rounded-full flex items-center justify-center text-white">
+            </div>
+            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-white pointer-events-none select-none">
               🔇
-            </button>
-            <button className="w-12 h-12 bg-gray-600 hover:bg-gray-700 rounded-full flex items-center justify-center text-white">
+            </div>
+            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-white pointer-events-none select-none">
               📢
-            </button>
+            </div>
           </div>
 
           {/* Hint Display */}
@@ -113,7 +113,7 @@ export default function PhoneCallInterface({ stepData, onChoice, showHint, onUse
 
       {/* Choice Options Panel */}
       {showDialogue && (
-        <div className="flex-1 max-w-md">
+        <div className="w-full lg:flex-1 lg:max-w-md">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
               How do you respond?

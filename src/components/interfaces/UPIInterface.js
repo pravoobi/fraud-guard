@@ -179,10 +179,10 @@ export default function UPIInterface({ stepData, onChoice, showHint, onUseHint }
   };
 
   return (
-    <div className="max-w-6xl mx-auto flex items-start gap-8">
+    <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-8">
       {/* Phone Frame */}
-      <div className="bg-black rounded-3xl p-4 shadow-2xl flex-shrink-0">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl h-[600px] w-[320px] relative overflow-hidden">
+      <div className="bg-black rounded-3xl p-4 shadow-2xl w-full max-w-[340px]">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl h-[560px] w-full relative overflow-hidden">
           {/* Status Bar */}
           <div className="flex justify-between items-center p-4 text-sm">
             <div className="flex items-center space-x-1">
@@ -224,7 +224,7 @@ export default function UPIInterface({ stepData, onChoice, showHint, onUseHint }
       </div>
 
       {/* Info Panel */}
-      <div className="flex-1 max-w-md">
+      <div className="w-full lg:flex-1 lg:max-w-md">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
             📱 UPI Learning Session

@@ -90,15 +90,13 @@ export default function ScenarioEngine({ scenario, module, onComplete, onExit })
     const correctChoices = finalChoices.filter(c => c.isCorrect).length;
     const totalChoices = finalChoices.length;
     const hintsUsed = state.currentSession.hints;
-    
-    // Base score calculation
+
     let score = Math.round((correctChoices / totalChoices) * 100);
-    
-    // Penalty for hints
     score = Math.max(0, score - (hintsUsed * 5));
-    
-    // Bonus for speed (if completed quickly)
-    const timeBonus = totalChoices < 3 && finalChoices[finalChoices.length - 1].timestamp < 60000 ? 10 : 0;
+
+    // Bonus for fast completion (under 60 s regardless of step count)
+    const elapsed = finalChoices[finalChoices.length - 1]?.timestamp ?? Infinity;
+    const timeBonus = elapsed < 60000 ? 10 : 0;
     score = Math.min(100, score + timeBonus);
 
     setScenarioScore(score);
@@ -111,53 +109,24 @@ export default function ScenarioEngine({ scenario, module, onComplete, onExit })
     setShowHint(true);
   };
 
+  // Saves the completed scenario and returns to the module page.
+  // scenarioScore is already set by calculateFinalScore before this is called.
   const handleCompleteScenario = () => {
-    // Calculate final score
-    const finalScore = calculateFinalScore(choices);
-    
-    // Dispatch scenario completion
     dispatch({
       type: 'COMPLETE_SCENARIO',
       payload: {
         scenarioId: scenario.id,
-        score: finalScore,
+        score: scenarioScore,
         timeSpent: Date.now() - startTime,
         hintsUsed: state.currentSession.hints,
-        choices: choices,
+        choices,
         completedAt: new Date().toISOString()
       }
     });
-    
-    // Check if all scenarios in the module are completed
-    const moduleScenarios = module.scenarios || [];
-    const completedScenarios = moduleScenarios.filter(scenario => 
-      state.progress.scenariosProgress[scenario.id]?.completed
-    ).length;
-    
-    // If all scenarios are completed, mark module as complete
-    if (completedScenarios === moduleScenarios.length && moduleScenarios.length > 0) {
-      const moduleScore = Math.round(
-        moduleScenarios.reduce((acc, scenario) => 
-          acc + (state.progress.scenariosProgress[scenario.id]?.score || 0), 0
-        ) / moduleScenarios.length
-      );
-      
-      dispatch({
-        type: 'COMPLETE_MODULE',
-        payload: {
-          moduleId: module.id,
-          score: moduleScore,
-          scenarios: moduleScenarios.map(s => s.id)
-        }
-      });
-    }
-    
+
     onComplete({
       scenarioId: scenario.id,
-      score: finalScore,
-      choices,
-      timeSpent: Date.now() - startTime,
-      hintsUsed: state.currentSession.hints
+      score: scenarioScore,
     });
   };
 
@@ -421,7 +390,7 @@ export default function ScenarioEngine({ scenario, module, onComplete, onExit })
                   🔄 Try Again
                 </button>
                 <button
-                  onClick={onExit}
+                  onClick={handleCompleteScenario}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
                 >
                   ← Back to Module

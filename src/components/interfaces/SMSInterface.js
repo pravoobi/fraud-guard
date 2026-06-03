@@ -44,27 +44,31 @@ export default function SMSInterface({ stepData, onChoice, showHint, onUseHint }
               </div>
 
               <div className="space-y-3">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="Username"
+                  aria-label="Username (fake site — do not enter real credentials)"
                   className="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700"
                   disabled
                 />
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   placeholder="Password"
+                  aria-label="Password (fake site — do not enter real credentials)"
                   className="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700"
                   disabled
                 />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="Debit Card Number"
+                  aria-label="Debit Card Number (fake site — do not enter real credentials)"
                   className="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700"
                   disabled
                 />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="CVV"
+                  aria-label="CVV (fake site — do not enter real credentials)"
                   className="w-full p-2 border rounded bg-gray-100 dark:bg-gray-700"
                   disabled
                 />
@@ -85,10 +89,10 @@ export default function SMSInterface({ stepData, onChoice, showHint, onUseHint }
   };
 
   return (
-    <div className="max-w-6xl mx-auto flex items-start gap-8">
+    <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-8">
       {/* Phone Frame */}
-      <div className="bg-black rounded-3xl p-4 shadow-2xl flex-shrink-0">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl h-[600px] w-[320px] relative overflow-hidden">
+      <div className="bg-black rounded-3xl p-4 shadow-2xl w-full max-w-[340px]">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl h-[560px] w-full relative overflow-hidden">
           {/* Status Bar */}
           <div className="flex justify-between items-center p-4 text-sm bg-gray-50 dark:bg-gray-800">
             <div className="flex items-center space-x-1">
@@ -149,7 +153,7 @@ export default function SMSInterface({ stepData, onChoice, showHint, onUseHint }
       </div>
 
       {/* Options Panel */}
-      <div className="flex-1 max-w-md">
+      <div className="w-full lg:flex-1 lg:max-w-md">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
             📱 SMS Analysis

@@ -43,12 +43,21 @@ const initialState = {
 
 function appReducer(state, action) {
   switch (action.type) {
+    case 'HYDRATE':
+      // Restore saved state wholesale — never replay actions on hydration
+      return {
+        ...initialState,
+        ...action.payload,
+        // Always reset the active session on page load
+        currentSession: initialState.currentSession,
+      };
+
     case 'SET_USER':
       return {
         ...state,
         user: { ...state.user, ...action.payload }
       };
-    
+
     case 'START_MODULE':
       return {
         ...state,
@@ -61,7 +70,7 @@ function appReducer(state, action) {
           hints: 0
         }
       };
-    
+
     case 'START_SCENARIO':
       return {
         ...state,
@@ -73,7 +82,7 @@ function appReducer(state, action) {
           hints: 0
         }
       };
-    
+
     case 'MAKE_CHOICE':
       return {
         ...state,
@@ -82,7 +91,7 @@ function appReducer(state, action) {
           choices: [...state.currentSession.choices, action.payload]
         }
       };
-    
+
     case 'USE_HINT':
       return {
         ...state,
@@ -91,36 +100,40 @@ function appReducer(state, action) {
           hints: state.currentSession.hints + 1
         }
       };
-    
-    case 'COMPLETE_SCENARIO':
+
+    case 'COMPLETE_SCENARIO': {
       const scenarioScore = action.payload.score;
-      const timeSpent = Date.now() - state.currentSession.startTime;
-      const hintsUsed = state.currentSession.hints;
-      
-      // Calculate new average score
+      const timeSpent = action.payload.timeSpent || (Date.now() - (state.currentSession.startTime || Date.now()));
+      const hintsUsed = action.payload.hintsUsed ?? state.currentSession.hints;
+
+      // Skip if already completed (prevents double-dispatch from saving twice)
+      if (state.progress.scenariosProgress[action.payload.scenarioId]?.completed) {
+        return state;
+      }
+
       const totalScenarios = state.user.totalScenariosCompleted + 1;
       const newAverageScore = ((state.user.averageScenarioScore * state.user.totalScenariosCompleted) + scenarioScore) / totalScenarios;
-      
-      // Update streak
+
       const today = new Date().toDateString();
       const lastActivity = state.user.lastActivityDate ? new Date(state.user.lastActivityDate).toDateString() : null;
-      const newStreak = lastActivity === today ? state.user.streak : 
-                       lastActivity === new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString() ? state.user.streak + 1 : 1;
-      
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
+      const newStreak = lastActivity === today ? state.user.streak
+                      : lastActivity === yesterday ? state.user.streak + 1
+                      : 1;
+
       const newScenarioProgress = {
         ...state.progress.scenariosProgress,
         [action.payload.scenarioId]: {
           completed: true,
           score: scenarioScore,
-          timeSpent: timeSpent,
-          hintsUsed: hintsUsed,
-          choices: state.currentSession.choices,
-          completedAt: new Date().toISOString(),
+          timeSpent,
+          hintsUsed,
+          choices: action.payload.choices || [],
+          completedAt: action.payload.completedAt || new Date().toISOString(),
           moduleId: state.currentSession.moduleId
         }
       };
-      
-      // Update daily progress
+
       const todayKey = new Date().toDateString();
       const dailyProgress = {
         ...state.progress.dailyProgress,
@@ -130,13 +143,13 @@ function appReducer(state, action) {
           timeSpent: (state.progress.dailyProgress[todayKey]?.timeSpent || 0) + timeSpent
         }
       };
-      
+
       return {
         ...state,
         progress: {
           ...state.progress,
           scenariosProgress: newScenarioProgress,
-          dailyProgress: dailyProgress
+          dailyProgress
         },
         user: {
           ...state.user,
@@ -149,11 +162,17 @@ function appReducer(state, action) {
           totalTimeSpent: state.user.totalTimeSpent + timeSpent
         }
       };
-    
-    case 'COMPLETE_MODULE':
+    }
+
+    case 'COMPLETE_MODULE': {
+      // Skip if already completed
+      if (state.progress.modulesProgress[action.payload.moduleId]?.completed) {
+        return state;
+      }
+
       const moduleScore = action.payload.score;
       const moduleScenarios = action.payload.scenarios || [];
-      
+
       const newModuleProgress = {
         ...state.progress.modulesProgress,
         [action.payload.moduleId]: {
@@ -161,25 +180,21 @@ function appReducer(state, action) {
           score: moduleScore,
           completedAt: new Date().toISOString(),
           scenariosCompleted: moduleScenarios.length,
-          averageScenarioScore: moduleScenarios.length > 0 ? 
-            Math.round(moduleScenarios.reduce((acc, scenarioId) => 
+          averageScenarioScore: moduleScenarios.length > 0 ?
+            Math.round(moduleScenarios.reduce((acc, scenarioId) =>
               acc + (state.progress.scenariosProgress[scenarioId]?.score || 0), 0) / moduleScenarios.length) : 0
         }
       };
-      
-      // Check for badges
+
       const newBadges = [...state.user.badges];
-      if (!state.user.completedModules.includes(action.payload.moduleId)) {
-        newBadges.push({
-          id: `module-${action.payload.moduleId}`,
-          name: `Module Master`,
-          description: `Completed ${action.payload.moduleId} module`,
-          icon: '🏆',
-          earnedAt: new Date().toISOString()
-        });
-      }
-      
-      // Check for streak badges
+      newBadges.push({
+        id: `module-${action.payload.moduleId}`,
+        name: 'Module Master',
+        description: `Completed ${action.payload.moduleId} module`,
+        icon: '🏆',
+        earnedAt: new Date().toISOString()
+      });
+
       if (state.user.streak >= 7 && !state.user.badges.find(b => b.id === 'week-streak')) {
         newBadges.push({
           id: 'week-streak',
@@ -189,7 +204,7 @@ function appReducer(state, action) {
           earnedAt: new Date().toISOString()
         });
       }
-      
+
       return {
         ...state,
         progress: {
@@ -203,16 +218,17 @@ function appReducer(state, action) {
           badges: newBadges
         }
       };
-    
+    }
+
     case 'UPDATE_SETTINGS':
       return {
         ...state,
         settings: { ...state.settings, ...action.payload }
       };
-    
+
     case 'RESET_PROGRESS':
       return initialState;
-    
+
     case 'UPDATE_STREAK':
       return {
         ...state,
@@ -222,7 +238,7 @@ function appReducer(state, action) {
           lastActivityDate: action.payload.lastActivityDate
         }
       };
-    
+
     default:
       return state;
   }
@@ -231,59 +247,20 @@ function appReducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  // Load saved state from sessionStorage on mount
   useEffect(() => {
-    const savedState = sessionStorage.getItem('fraudAwarenessApp');
-    if (savedState) {
+    const saved = localStorage.getItem('fraudAwarenessApp');
+    if (saved) {
       try {
-        const parsedState = JSON.parse(savedState);
-        // Merge saved state with initial state
-        dispatch({ type: 'SET_USER', payload: parsedState.user || {} });
-        
-        if (parsedState.progress) {
-          // Restore module progress
-          Object.keys(parsedState.progress.modulesProgress || {}).forEach(moduleId => {
-            const moduleData = parsedState.progress.modulesProgress[moduleId];
-            dispatch({ 
-              type: 'COMPLETE_MODULE', 
-              payload: { 
-                moduleId, 
-                score: moduleData.score || 0,
-                scenarios: moduleData.scenarios || []
-              } 
-            });
-          });
-          
-          // Restore scenario progress
-          Object.keys(parsedState.progress.scenariosProgress || {}).forEach(scenarioId => {
-            const scenarioData = parsedState.progress.scenariosProgress[scenarioId];
-            dispatch({
-              type: 'COMPLETE_SCENARIO',
-              payload: {
-                scenarioId,
-                score: scenarioData.score || 0,
-                timeSpent: scenarioData.timeSpent || 0,
-                hintsUsed: scenarioData.hintsUsed || 0,
-                choices: scenarioData.choices || [],
-                completedAt: scenarioData.completedAt
-              }
-            });
-          });
-        }
-        
-        // Restore progress data
-        if (parsedState.progress) {
-          dispatch({ type: 'SET_PROGRESS', payload: parsedState.progress });
-        }
-      } catch (error) {
-        console.error('Error loading saved state:', error);
+        const parsed = JSON.parse(saved);
+        dispatch({ type: 'HYDRATE', payload: parsed });
+      } catch {
+        // Corrupted storage — start fresh
       }
     }
   }, []);
 
-  // Save state to sessionStorage whenever it changes
   useEffect(() => {
-    sessionStorage.setItem('fraudAwarenessApp', JSON.stringify(state));
+    localStorage.setItem('fraudAwarenessApp', JSON.stringify(state));
   }, [state]);
 
   return (
@@ -299,4 +276,4 @@ export function useApp() {
     throw new Error('useApp must be used within an AppProvider');
   }
   return context;
-} 
+}
