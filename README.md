@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# FraudGuard — Digital Fraud Awareness Platform
 
-## Getting Started
+An interactive eLearning platform that educates users about digital fraud prevention and cybersecurity. Built specifically for Indian users to recognize and defend against common fraud schemes through realistic simulations.
 
-First, run the development server:
+**Live app:** [https://pravoobi.github.io/fraud-guard/](https://pravoobi.github.io/fraud-guard/)
+
+---
+
+## What It Does
+
+FraudGuard walks users through realistic fraud scenarios — phone calls, SMS phishing, UPI scams — and teaches them how to respond correctly. Users earn a Fraud Awareness Score, track streaks, collect badges, and can generate a completion certificate once they finish all modules.
+
+### Learning Modules
+
+| Module | Topic |
+|--------|-------|
+| 1 | UPI Fraud Protection |
+| 2 | Bank Impersonation Detection |
+| 3 | KYC Scam Prevention |
+| 4 | Aadhaar / PAN Fraud Alerts |
+| 5 | Loan & Credit Card Scam Detection |
+| 6 | Digital Arrest Scam Protection |
+
+### Key Features
+
+- **Interactive scenarios** — phone call simulations with spoofed caller ID, SMS phishing demos, UPI app interactions
+- **Progress tracking** — Fraud Awareness Score (0–100), learning streaks, module completion, badges
+- **Emergency resources** — immediate action steps for fraud victims, emergency contacts (Cyber Crime Helpline 1930, Police 100), bank helpline directory for 10+ Indian banks
+- **Completion certificate** — downloadable certificate with user name and score after finishing all 6 modules
+- **4 language support** — English, Hindi (हिन्दी), Tamil (தமிழ்), Telugu (తెలుగు)
+- **Fully offline** — no backend, no accounts; progress is saved in your browser's localStorage
+
+---
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router, static export)
+- **UI:** React 19, Tailwind CSS 4
+- **i18n:** Custom `useTranslation` hook with per-language JSON files
+- **Certificate generation:** `html-to-image`
+- **State / persistence:** React Context + localStorage (no backend)
+- **Deployment:** GitHub Pages & Vercel
+
+---
+
+## Running Locally
 
 ```bash
+# Install dependencies
+npm install
+
+# Start development server at http://localhost:3000
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Production build (outputs to /out)
+npm run build
+
+# GitHub Pages build (sets basePath to /fraud-guard/)
+npm run build:github
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+  app/               # Next.js pages (/, /dashboard, /module/[id], /emergency, /certificate)
+  components/        # UI components (ScenarioEngine, Dashboard, PhoneCallInterface, ...)
+  context/           # AppContext — global state (progress, score, language)
+  data/              # Module definitions, scenario steps, scenario translations
+  hooks/             # useTranslation
+  translations/      # UI strings per language (en, hi, ta, te)
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The app is statically exported and hosted on GitHub Pages at:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+https://pravoobi.github.io/fraud-guard/
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+It can also be deployed to Vercel or any static host (Netlify, AWS S3, etc.) — no server required.
