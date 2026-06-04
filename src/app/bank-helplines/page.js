@@ -1,8 +1,13 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/hooks/useTranslation';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function BankHelplinesPage() {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState('');
   const banks = [
     {
       name: "State Bank of India",
@@ -66,6 +71,19 @@ export default function BankHelplinesPage() {
     }
   ];
 
+  const filteredBanks = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return banks;
+    const digits = q.replace(/\D/g, '');
+    return banks.filter((bank) => {
+      if (bank.name.toLowerCase().includes(q)) return true;
+      if (bank.website.toLowerCase().includes(q)) return true;
+      if (bank.features.some((f) => f.toLowerCase().includes(q))) return true;
+      if (digits && bank.number.replace(/\D/g, '').includes(digits)) return true;
+      return false;
+    });
+  }, [query, banks]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
       {/* Header */}
@@ -75,22 +93,17 @@ export default function BankHelplinesPage() {
             <Link href="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
               <div className="text-3xl">🛡️</div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">FraudGuard</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Bank Helplines</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('brand.name')}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t('common.bank_helplines')}</p>
               </div>
             </Link>
-            <div className="flex items-center space-x-4">
-              <Link 
-                href="/emergency"
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                ← Emergency Help
-              </Link>
-              <Link 
+            <div className="flex items-center space-x-3">
+              <LanguageSwitcher />
+              <Link
                 href="/dashboard"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
               >
-                Dashboard
+                {t('common.dashboard')}
               </Link>
             </div>
           </div>
@@ -143,49 +156,93 @@ export default function BankHelplinesPage() {
 
         {/* Bank Directory */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Major Indian Banks</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {banks.map((bank, index) => (
-              <div key={index} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-lg">{bank.name}</h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">{bank.website}</p>
-                  </div>
-                  <div className="text-right">
-                    <a 
-                      href={`tel:${bank.number}`}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
-                    >
-                      📞 Call Now
-                    </a>
-                  </div>
-                </div>
-                
-                <div className="mb-4">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
-                    {bank.number}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Toll-free number</p>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Services Available:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {bank.features.map((feature, featureIndex) => (
-                      <span 
-                        key={featureIndex}
-                        className="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-full"
-                      >
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Major Indian Banks</h2>
+            <div className="relative w-full md:w-80">
+              <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none" aria-hidden="true">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </span>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by bank, number, or service…"
+                aria-label="Search banks"
+                className="w-full pl-9 pr-9 py-2 text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {query && (
+                <button
+                  onClick={() => setQuery('')}
+                  className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  aria-label="Clear search"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </div>
+
+          {query && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Showing {filteredBanks.length} of {banks.length} banks
+            </p>
+          )}
+
+          {filteredBanks.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-4xl mb-3">🔍</div>
+              <p className="text-gray-600 dark:text-gray-300 font-medium mb-1">No banks match &quot;{query}&quot;</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Try a different search term or clear the filter.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredBanks.map((bank, index) => (
+                <div key={index} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-lg">{bank.name}</h3>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">{bank.website}</p>
+                    </div>
+                    <div className="text-right">
+                      <a
+                        href={`tel:${bank.number}`}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
+                      >
+                        📞 Call Now
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                      {bank.number}
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Toll-free number</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Services Available:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {bank.features.map((feature, featureIndex) => (
+                        <span
+                          key={featureIndex}
+                          className="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-full"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Additional Information */}

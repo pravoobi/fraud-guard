@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { scenarioData } from '@/data/scenarios';
+import { getTranslatedScenario } from '@/data/scenariosTranslations';
 import PhoneCallInterface from './interfaces/PhoneCallInterface';
 import UPIInterface from './interfaces/UPIInterface';
 import SMSInterface from './interfaces/SMSInterface';
@@ -17,7 +18,11 @@ export default function ScenarioEngine({ scenario, module, onComplete, onExit })
   const [scenarioScore, setScenarioScore] = useState(0);
   const [startTime] = useState(Date.now());
 
-  const scenarioContent = scenarioData[scenario.id];
+  const lang = state.settings.language || 'en';
+  const scenarioContent = useMemo(
+    () => getTranslatedScenario(scenarioData[scenario.id], scenario.id, lang),
+    [scenario.id, lang]
+  );
 
   if (!scenarioContent) {
     return (
@@ -272,13 +277,13 @@ export default function ScenarioEngine({ scenario, module, onComplete, onExit })
       };
       
       // Update the scenario progress in context
-      dispatch({ 
-        type: 'COMPLETE_SCENARIO', 
+      dispatch({
+        type: 'COMPLETE_SCENARIO',
         payload: completionData
       });
-      
-      // Return to module
-      onExit();
+
+      // Use onComplete (not onExit) so ModulePage can check module completion synchronously
+      onComplete({ scenarioId: scenario.id, score: 100 });
     };
 
     return (

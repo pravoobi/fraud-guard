@@ -959,7 +959,7 @@ export const scenarioData = {
             text: 'Report the phishing attempt',
             isCorrect: true,
             explanation: 'Excellent! Reporting helps authorities track and stop these scams.',
-            nextStep: 7
+            nextStep: 8
           }
         ]
       },
@@ -1304,7 +1304,7 @@ export const scenarioData = {
             text: 'Pay the processing fee immediately',
             isCorrect: false,
             explanation: 'Wrong! Legitimate banks never ask for upfront fees before loan approval.',
-            nextStep: 4
+            nextStep: 5
           },
           {
             text: 'Ask for official documentation',
@@ -1340,19 +1340,19 @@ export const scenarioData = {
             text: 'Share your card details',
             isCorrect: false,
             explanation: 'Wrong! Banks never ask for CVV or full card numbers over phone.',
-            nextStep: 4
+            nextStep: 5
           },
           {
             text: 'Ask them to send official communication',
             isCorrect: true,
             explanation: 'Good! Legitimate banks send official communications for such requests.',
-            nextStep: 3
+            nextStep: 4
           },
           {
             text: 'Call the official bank number',
             isCorrect: true,
             explanation: 'Excellent! Always verify through official channels.',
-            nextStep: 3
+            nextStep: 4
           }
         ]
       },
@@ -1371,7 +1371,7 @@ export const scenarioData = {
             text: 'Report the scam attempts',
             isCorrect: true,
             explanation: 'Excellent! Reporting helps authorities track and stop these scams.',
-            nextStep: 5
+            nextStep: 6
           }
         ]
       },
@@ -1387,10 +1387,11 @@ export const scenarioData = {
         ],
         choices: [
           {
-            text: 'Report to authorities immediately',
-            isCorrect: true,
-            explanation: 'Good! Report the fraud to police and your bank immediately.',
-            nextStep: 5
+            text: 'Report to police and your bank immediately',
+            isCorrect: false,
+            explanation: 'Remember: Legitimate banks never ask for upfront fees or card details over the phone. Always call the official bank number printed on your card to verify.',
+            consequence: 'Money lost to loan/credit card scam',
+            nextStep: null
           }
         ]
       },
@@ -1515,7 +1516,7 @@ export const scenarioData = {
             text: 'Panic and follow their instructions',
             isCorrect: false,
             explanation: 'Wrong! Real authorities don\'t call to threaten arrest or demand money.',
-            nextStep: 4
+            nextStep: 5
           },
           {
             text: 'Ask for official documentation',
@@ -1547,19 +1548,19 @@ export const scenarioData = {
             text: 'Pay the demanded amount',
             isCorrect: false,
             explanation: 'Wrong! This is a scam. Real authorities don\'t demand money over phone calls.',
-            nextStep: 4
+            nextStep: 5
           },
           {
             text: 'Ask to visit the police station',
             isCorrect: true,
             explanation: 'Good! Real authorities would allow you to visit in person.',
-            nextStep: 3
+            nextStep: 4
           },
           {
             text: 'Contact a lawyer',
             isCorrect: true,
             explanation: 'Excellent! Consulting a lawyer is a good way to verify legal matters.',
-            nextStep: 3
+            nextStep: 4
           }
         ]
       },
@@ -1578,7 +1579,7 @@ export const scenarioData = {
             text: 'Report the scam attempt',
             isCorrect: true,
             explanation: 'Excellent! Reporting helps authorities track and stop these scams.',
-            nextStep: 5
+            nextStep: 6
           }
         ]
       },
@@ -1594,10 +1595,11 @@ export const scenarioData = {
         ],
         choices: [
           {
-            text: 'Report to police immediately',
-            isCorrect: true,
-            explanation: 'Good! Report the fraud to your local police station immediately.',
-            nextStep: 5
+            text: 'Report to police and block your bank accounts immediately',
+            isCorrect: false,
+            explanation: 'Remember: Real authorities never demand money over phone calls or threaten arrest. Always verify by visiting your local police station in person.',
+            consequence: 'Money lost to digital arrest scam',
+            nextStep: null
           }
         ]
       },
@@ -1751,13 +1753,13 @@ export const scenarioData = {
             text: 'Hang up and call the official UIDAI helpline 1947 to verify',
             isCorrect: true,
             explanation: 'Perfect. UIDAI\'s real helpline is 1947. Call them directly to confirm — they will tell you no such action was initiated.',
-            nextStep: 3
+            nextStep: 2
           },
           {
             text: 'Share the OTP to deactivate my Aadhaar and avoid arrest',
             isCorrect: false,
             explanation: 'UIDAI never asks for OTPs over phone calls to deactivate Aadhaar. Sharing an OTP with this caller would give them access to your accounts.',
-            nextStep: 4
+            nextStep: 3
           },
           {
             text: 'Ask for their employee ID and official documentation',
@@ -1782,13 +1784,13 @@ export const scenarioData = {
             text: 'Hang up immediately — real officials do not threaten or rush you',
             isCorrect: true,
             explanation: 'Correct. Threats and artificial urgency are the two biggest signs of a scam. Real government officials send written notices and follow proper legal procedures.',
-            nextStep: 3
+            nextStep: 2
           },
           {
             text: 'Share the OTP to stop the harassment',
             isCorrect: false,
             explanation: 'The threats are designed to make you panic and act without thinking. Sharing the OTP will not stop anything — it will give them access to your accounts.',
-            nextStep: 4
+            nextStep: 3
           }
         ]
       },

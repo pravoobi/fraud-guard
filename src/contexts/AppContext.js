@@ -35,6 +35,7 @@ const initialState = {
   },
   settings: {
     language: 'en',
+    languageSelected: false,
     darkMode: false,
     soundEnabled: true,
     hintsEnabled: true

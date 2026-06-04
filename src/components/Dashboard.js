@@ -3,13 +3,16 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/contexts/AppContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { fraudModules } from '@/data/modules';
 import ModuleCard from './ModuleCard';
 import ProgressOverview from './ProgressOverview';
 import FraudAwarenessScore from './FraudAwarenessScore';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Dashboard() {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const router = useRouter();
 
   const handleStartModule = (moduleId) => {
@@ -30,15 +33,16 @@ export default function Dashboard() {
             <Link href="/" className="flex items-center space-x-4">
               <div className="text-3xl">🛡️</div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">FraudGuard</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Fraud Awareness eLearning Platform</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('brand.name')}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t('brand.tagline_dashboard')}</p>
               </div>
             </Link>
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3 sm:space-x-6">
+              <LanguageSwitcher />
               <FraudAwarenessScore score={state.user.fraudAwarenessScore} />
-              <div className="text-sm text-gray-600 dark:text-gray-300">
-                <div>Streak: <span className="font-semibold text-orange-600">{state.user.streak} days</span></div>
-                <div>Modules: <span className="font-semibold text-green-600">{state.user.completedModules.length}/{fraudModules.length}</span></div>
+              <div className="hidden sm:block text-sm text-gray-600 dark:text-gray-300">
+                <div>{t('dashboard.streak')}: <span className="font-semibold text-orange-600">{state.user.streak} {t('common.days')}</span></div>
+                <div>{t('common.modules')}: <span className="font-semibold text-green-600">{state.user.completedModules.length}/{fraudModules.length}</span></div>
               </div>
             </div>
           </div>
@@ -49,56 +53,55 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Welcome to Fraud Awareness Training
+            {t('dashboard.welcome_title')}
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-            Learn to protect yourself from digital fraud, scams, and cybercrime through interactive scenarios 
-            and real-world simulations. Your safety is our priority.
+            {t('dashboard.welcome_text')}
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
               <div className="text-2xl mb-2">🎯</div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Interactive Learning</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('dashboard.interactive_title')}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                Experience real-world fraud scenarios in a safe environment
+                {t('dashboard.interactive_desc')}
               </p>
             </div>
-            
+
             <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
               <div className="text-2xl mb-2">📊</div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Track Progress</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('dashboard.progress_title')}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                Monitor your fraud awareness score and completed modules
+                {t('dashboard.progress_desc')}
               </p>
             </div>
-            
+
             <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800">
               <div className="text-2xl mb-2">🏆</div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Earn Badges</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{t('dashboard.badges_title')}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                Complete modules to earn achievements and certificates
+                {t('dashboard.badges_desc')}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Certificate banner — shown when all modules are complete */}
+        {/* Certificate banner */}
         {allModulesComplete && (
           <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-xl p-6 mb-8 text-white">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="text-4xl">🏆</div>
                 <div>
-                  <h3 className="text-xl font-bold">You completed all 6 modules!</h3>
-                  <p className="text-blue-100 text-sm">Your Fraud Awareness certificate is ready to download.</p>
+                  <h3 className="text-xl font-bold">{t('dashboard.certificate_banner.title', { count: fraudModules.length })}</h3>
+                  <p className="text-blue-100 text-sm">{t('dashboard.certificate_banner.subtitle')}</p>
                 </div>
               </div>
               <Link
                 href="/certificate"
                 className="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
               >
-                View Certificate →
+                {t('dashboard.certificate_banner.cta')}
               </Link>
             </div>
           </div>
@@ -109,7 +112,7 @@ export default function Dashboard() {
 
         {/* Learning Modules */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Learning Modules</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('common.learning_modules')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {fraudModules.map((module) => (
               <ModuleCard
@@ -127,32 +130,32 @@ export default function Dashboard() {
           <div className="flex items-center mb-4">
             <div className="text-3xl mr-4">🚨</div>
             <div>
-              <h2 className="text-xl font-bold text-red-900 dark:text-red-200">Emergency Help</h2>
-              <p className="text-red-700 dark:text-red-300">If you're currently experiencing fraud</p>
+              <h2 className="text-xl font-bold text-red-900 dark:text-red-200">{t('dashboard.emergency.title')}</h2>
+              <p className="text-red-700 dark:text-red-300">{t('dashboard.emergency.subtitle')}</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a 
+            <a
               href="tel:1930"
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
             >
-              📞 Report Fraud: 1930
+              {t('dashboard.emergency.report')}
             </a>
-            <Link 
+            <Link
               href="/bank-helplines"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
             >
-              🏦 Bank Helplines
+              {t('dashboard.emergency.bank_helplines')}
             </Link>
-            <Link 
+            <Link
               href="/emergency"
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
             >
-              📋 Step-by-Step Guide
+              {t('dashboard.emergency.guide')}
             </Link>
           </div>
         </div>
       </main>
     </div>
   );
-} 
+}

@@ -1,43 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { fraudModules } from '@/data/modules';
 import ScenarioEngine from './ScenarioEngine';
 import ErrorBoundary from './ErrorBoundary';
+import LanguageSwitcher from './LanguageSwitcher';
 import Link from 'next/link';
 
 export default function ModulePage({ moduleId }) {
   const { state, dispatch } = useApp();
+  const { t } = useTranslation();
   const [activeScenarioId, setActiveScenarioId] = useState(null);
 
   const currentModule = fraudModules.find(m => m.id === moduleId);
   const progress = state.progress.modulesProgress[moduleId];
 
-  // Dispatch COMPLETE_MODULE when all scenarios in this module are done.
-  // Runs reactively on state changes — no setTimeout, no sessionStorage reads.
-  useEffect(() => {
-    if (!currentModule) return;
-    const moduleScenarios = currentModule.scenarios.map(s => s.id);
-    const allCompleted = moduleScenarios.every(
-      sid => state.progress.scenariosProgress[sid]?.completed
-    );
-    if (allCompleted && !state.progress.modulesProgress[moduleId]?.completed) {
-      const averageScore = Math.round(
-        moduleScenarios.reduce((acc, sid) =>
-          acc + (state.progress.scenariosProgress[sid]?.score || 0), 0
-        ) / moduleScenarios.length
-      );
-      dispatch({ type: 'COMPLETE_MODULE', payload: { moduleId, score: averageScore, scenarios: moduleScenarios } });
-    }
-  }, [state.progress.scenariosProgress]); // eslint-disable-line react-hooks/exhaustive-deps
-
   if (!currentModule) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Module Not Found</h1>
-          <Link href="/dashboard" className="text-blue-600 hover:text-blue-700">← Back to Dashboard</Link>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('module_page.not_found')}</h1>
+          <Link href="/dashboard" className="text-blue-600 hover:text-blue-700">{t('common.back_to_dashboard')}</Link>
         </div>
       </div>
     );
@@ -48,9 +33,24 @@ export default function ModulePage({ moduleId }) {
     setActiveScenarioId(scenarioId);
   };
 
-  // ScenarioEngine dispatches COMPLETE_SCENARIO before calling onComplete.
-  // Module completion is handled by the useEffect above.
-  const handleCompleteScenario = () => {
+  // Called by ScenarioEngine after it dispatches COMPLETE_SCENARIO.
+  // Checks module completion synchronously so both dispatches are batched
+  // into one React update — ensuring localStorage is written atomically.
+  const handleCompleteScenario = ({ scenarioId, score } = {}) => {
+    if (currentModule && scenarioId && !progress?.completed) {
+      const moduleScenarios = currentModule.scenarios.map(s => s.id);
+      const willAllBeCompleted = moduleScenarios.every(
+        sid => sid === scenarioId || state.progress.scenariosProgress[sid]?.completed
+      );
+      if (willAllBeCompleted) {
+        const avgScore = Math.round(
+          moduleScenarios
+            .map(sid => (sid === scenarioId ? score : (state.progress.scenariosProgress[sid]?.score || 0)))
+            .reduce((a, b) => a + b, 0) / moduleScenarios.length
+        );
+        dispatch({ type: 'COMPLETE_MODULE', payload: { moduleId, score: avgScore, scenarios: moduleScenarios } });
+      }
+    }
     setActiveScenarioId(null);
   };
 
@@ -76,18 +76,19 @@ export default function ModulePage({ moduleId }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 font-medium">
-                ← Back to Dashboard
+                {t('common.back_to_dashboard')}
               </Link>
               <div className="text-2xl">{currentModule.icon}</div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{currentModule.title}</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{currentModule.description}</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t(`modules.${currentModule.id}.title`)}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t(`modules.${currentModule.id}.description`)}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600 dark:text-gray-300">
-                <div>Difficulty: <span className="font-semibold">{currentModule.difficulty}</span></div>
-                <div>Duration: <span className="font-semibold">{currentModule.estimatedTime}</span></div>
+              <LanguageSwitcher />
+              <div className="hidden sm:block text-sm text-gray-600 dark:text-gray-300">
+                <div>{t('module_page.difficulty')}: <span className="font-semibold">{t(`difficulty.${currentModule.difficulty}`)}</span></div>
+                <div>{t('module_page.duration')}: <span className="font-semibold">{currentModule.estimatedTime}</span></div>
               </div>
             </div>
           </div>
@@ -99,42 +100,30 @@ export default function ModulePage({ moduleId }) {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8 border border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Learning Objectives</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('module_page.objectives_heading')}</h2>
               <div className="space-y-3 mb-6">
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mt-0.5">
-                    <span className="text-blue-600 text-sm">✓</span>
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="flex items-start space-x-3">
+                    <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mt-0.5">
+                      <span className="text-blue-600 text-sm">✓</span>
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300">{t(`module_page.objective_${n}`)}</p>
                   </div>
-                  <p className="text-gray-700 dark:text-gray-300">Identify common fraud patterns and red flags</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mt-0.5">
-                    <span className="text-blue-600 text-sm">✓</span>
-                  </div>
-                  <p className="text-gray-700 dark:text-gray-300">Practice safe response techniques in realistic scenarios</p>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mt-0.5">
-                    <span className="text-blue-600 text-sm">✓</span>
-                  </div>
-                  <p className="text-gray-700 dark:text-gray-300">Learn verification steps and safety protocols</p>
-                </div>
+                ))}
               </div>
 
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">What You'll Learn</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('module_page.learn_heading')}</h3>
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                This module provides hands-on experience with real-world fraud scenarios.
-                Each interactive scenario teaches you to recognize warning signs, make safe decisions,
-                and protect yourself from common fraud techniques.
+                {t('module_page.learn_text')}
               </p>
             </div>
 
             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Module Progress</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{t('module_page.module_progress')}</h3>
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    <span>Scenarios Completed</span>
+                    <span>{t('module_page.scenarios_completed')}</span>
                     <span>{Object.keys(state.progress.scenariosProgress).filter(id =>
                       currentModule.scenarios.some(s => s.id === id) &&
                       state.progress.scenariosProgress[id]?.completed
@@ -158,10 +147,10 @@ export default function ModulePage({ moduleId }) {
                   <div className="bg-green-100 dark:bg-green-900/20 rounded-lg p-4 text-center">
                     <div className="text-2xl mb-2">🎉</div>
                     <div className="text-green-800 dark:text-green-400 font-semibold">
-                      Module Completed!
+                      {t('module_page.completed_title')}
                     </div>
                     <div className="text-green-600 dark:text-green-500 text-sm">
-                      Score: {progress.score}%
+                      {t('common.score')}: {progress.score}%
                     </div>
                   </div>
                 )}
@@ -172,7 +161,7 @@ export default function ModulePage({ moduleId }) {
 
         {/* Scenarios List */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Interactive Scenarios</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('module_page.scenarios_heading')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {currentModule.scenarios.map((scenario, index) => {
               const scenarioProgress = state.progress.scenariosProgress[scenario.id];
@@ -198,12 +187,12 @@ export default function ModulePage({ moduleId }) {
                         {isCompleted ? '✓' : index + 1}
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{scenario.title}</h3>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t(`scenarios.${scenario.id}.title`)}</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{scenario.type.replace('-', ' ')}</p>
                         {isCompleted && (
                           <div className="flex items-center space-x-2 mt-1">
                             <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 px-2 py-0.5 rounded-full">
-                              Completed
+                              {t('module_page.completed_badge')}
                             </span>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                               {new Date(scenarioProgress.completedAt).toLocaleDateString()}
@@ -219,7 +208,7 @@ export default function ModulePage({ moduleId }) {
                           {scenarioProgress.score}%
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {scenarioProgress.hintsUsed} hints used
+                          {t('module_page.hints_used', { count: scenarioProgress.hintsUsed })}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           {Math.round(scenarioProgress.timeSpent / 1000)}s
@@ -229,7 +218,7 @@ export default function ModulePage({ moduleId }) {
                   </div>
 
                   <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm leading-relaxed">
-                    {scenario.description}
+                    {t(`scenarios.${scenario.id}.description`)}
                   </p>
 
                   <button
@@ -245,7 +234,7 @@ export default function ModulePage({ moduleId }) {
                       }
                     `}
                   >
-                    {!isUnlocked ? '🔒 Complete Previous Scenario' : isCompleted ? 'Review Scenario' : 'Start Scenario'}
+                    {!isUnlocked ? t('module_page.unlock_prev') : isCompleted ? t('module_page.review_scenario') : t('common.start_scenario')}
                   </button>
                 </div>
               );

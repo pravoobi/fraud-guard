@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslation } from '@/hooks/useTranslation';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function EmergencyPage() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900">
       {/* Header */}
@@ -12,22 +15,17 @@ export default function EmergencyPage() {
             <Link href="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity">
               <div className="text-3xl">🛡️</div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">FraudGuard</h1>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Emergency Help</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('brand.name')}</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t('common.emergency_help')}</p>
               </div>
             </Link>
-            <div className="flex items-center space-x-4">
-              <Link 
-                href="/"
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                ← Home
-              </Link>
-              <Link 
+            <div className="flex items-center space-x-3">
+              <LanguageSwitcher />
+              <Link
                 href="/dashboard"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
               >
-                Dashboard
+                {t('common.dashboard')}
               </Link>
             </div>
           </div>
